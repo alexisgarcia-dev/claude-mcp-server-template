@@ -40,12 +40,12 @@ Repo state:
   3. CLAUDE.md root + .claude/Constitution.md (immutable rules)
 
 POSITIONING (v3 strategic decision)
-This template is NOT another generic MCP scaffold. Positioning verrouillé:
+This template is NOT another generic MCP scaffold. Positioning verrouille:
 "Plug-and-play REST API to MCP wrapper. Clone, edit one config file,
 point at your OpenAPI spec, ship in under 1 hour."
 
 Three commercial buyer segments validated by recent Upwork briefs:
-- Segment A (50% volume): founder technique pressé, has REST API
+- Segment A (50% volume): founder technique presse, has REST API
   documented OpenAPI/Swagger, wants Claude/ChatGPT access in <3 weeks
 - Segment B (30% volume): IT manager enterprise POC, wants OAuth real,
   audit logging, observability, will extend later
