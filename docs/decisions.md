@@ -75,3 +75,119 @@
 **Decision**: Bind 127.0.0.1 default. FastMCP auto-activates DNS rebinding protection. README documents 0.0.0.0 production behind reverse proxy pattern.
 **Consequences**: OWASP-baseline compliance. Differentiator vs 95% MCP templates 2026.
 **See**: design-v0.1.0.md §5
+
+---
+
+## ADR-011 — Strategic pivot: prospection volume → differentiating asset (J11–J12)
+
+**Date** : 2026-05-05 (J11) → 2026-05-06 (J12)
+**Status** : Accepted
+**Type** : Strategic (not technical)
+
+### Context
+
+Phase P1 freelance Upwork started J0 (2026-04-24). Cohort J0–J8: 10 proposals sent, 1 viewed, 0 interviews, 0 hires. L99 debrief J8 (v3.2) decomposed root causes:
+
+- Discipline pré-tri off-criteria: 25–45% (median 35%)
+- Timing outside 15–60 min sweet spot: 15–35% (median 25%)
+- 0-review structural barrier: 15–25% (median 20%) — non-repairable J9–J18
+- Style AI-flag residual: 5–15% (median 12%)
+
+The 0-review barrier (median 20%) is the only factor non-addressable by behavioral changes within J9–J18 timeframe. It requires a differentiating proof artifact.
+
+### Decision
+
+Pivot from "prospection volume + grille triage 5/5 + alertes timing" to "build differentiating MCP server template asset, ship as Upwork Project Catalog + dev.to article + repo public, use as proof in cover letters."
+
+Formal Upwork bid-ratio checkpoint J13 (originally 2026-05-07) **deliberately deferred** to allow asset construction priority.
+
+### Consequences
+
+**Positive:**
+- Compensates 0-review structural barrier (median 20% obstacle) with technical proof artifact
+- Reusable across multiple cover letters (single asset, multiple opportunities)
+- Reduces dependency on Upwork algorithm Best Match ranking (anti-fragile)
+- Creates ROADMAP-versioned IP that scales beyond Upwork (Gumroad bolt-on J60+)
+
+**Negative:**
+- Defers first € target window (J10–J18 cible MIN, P50)
+- Risks compounding "no revenue" pressure if asset doesn't yield contracts by J30
+- Ship deadline self-imposed = stress factor
+
+**Neutral:**
+- Skill investment carries forward regardless of asset commercial outcome
+
+### Revalidation criteria — J20 (2026-05-19, Tuesday)
+
+Five bids minimum sent post-ship using asset as proof. Tracked metrics:
+
+- **Interview rate** ≥ 2% (1+ interviews / 5 bids) → asset producing differentiation, continue path
+- **Interview rate** < 2% on 10+ bids → asset insufficient, fallback Plan B
+- **Bid-ratio drop after asset shipped vs J0–J8 baseline** → asset hurting positioning (overclaim?), fallback Plan C
+
+### Plan B (if J20 inconclusive)
+
+Return to prospection grille v3.2 (FREELANCE_OPERATIONS §4) + Loom proof artifact (60-90 min) + Project Catalog Standard tier listing. Asset becomes background, not primary differentiator.
+
+### Plan C (if J30 still no €)
+
+Reposition entirely or pivot platform (Wellfound after Top Rated qualifying, post-J60+).
+
+### Sources
+
+- L99 debrief J8 v3.2 (Project Files `L99-debrief-J8-axes-amelioration-20260502-v32.md`)
+- GigRadar Upwork algorithm 2026, SnipeWork 92-profile experiment
+- TIMELINE.md ancrage J0 = 2026-04-24
+
+---
+
+## ADR-012 — Cut "Tasks primitive 2025-11-25" claim from v0.1.0 marketing scope
+
+**Date** : 2026-05-07 (J13) — pre-J15 ship
+**Status** : Accepted
+
+### Context
+
+Initial v0.1.0 positioning (per MEMENTO Insight #12, J12 PM) listed 4 differentiators:
+
+1. Resources primitive demonstrated
+2. Prompts primitive demonstrated
+3. **Tasks primitive 2025-11-25 (cutting edge async, 0% public templates)**
+4. PantryAPI fake SaaS end-to-end demo
+
+Pre-sprint J14 verification confirmed `Tool #4 generate_meal_plan` uses `@mcp.tool(task=True)` decorator with `fastmcp.dependencies.Progress` — **the FastMCP framework abstraction**, not SEP-1686 RPC compliance.
+
+SEP-1686 RPC methods absent from codebase: `tasks/get`, `tasks/result`, `tasks/list`, `tasks/cancel`, `notifications/tasks/status`, `CreateTaskResult` response type.
+
+### Decision
+
+Remove "Tasks primitive 2025-11-25 (SEP-1686)" claim from v0.1.0 marketing copy (README, Catalog Upwork, dev.to article, tweet thread).
+
+Reposition the existing implementation as: **"Async tools with progress notifications via FastMCP `task=True`"** — honest, accurate, framework-feature description.
+
+Move "Full SEP-1686 Tasks primitive RPC compliance" to **ROADMAP v0.3.0** (target end June 2026).
+
+### Consequences
+
+**Positive:**
+- Marketing claim now defensible against any technical buyer review (cannot be contradicted by `grep` on the codebase)
+- Eliminates 2-3h scope expansion risk on J15 sprint (would have required implementing `tasks/*` RPC methods + spec compliance tests)
+- Roadmap v0.3.0 becomes credible feature, not a retro-fit
+
+**Negative:**
+- Drops from 4 to 3 differentiators in v0.1.0 — must lean harder on "Production-survival foundation" angle (5 pillars) as the primary USP
+
+**Neutral:**
+- The implementation `Tool #4 generate_meal_plan` keeps full functionality and demo value, just renamed
+
+### Revised v0.1.0 differentiators (3, not 4)
+
+1. Resources + Prompts primitives demonstrated end-to-end
+2. **Production-survival foundation** (5 cohesive pillars: Streamable HTTP + auth + OTel + pinned + healthcheck) vs 1-2 in competing public templates
+3. PantryAPI fake SaaS demo for plug-and-play self-validation
+
+### Sources
+
+- MCP spec 2025-11-25 SEP-1686 (`https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/tasks`)
+- MCP 2026 roadmap (March 2026): "Tasks primitive shipped as experimental, lifecycle gaps remain"
+- gofastmcp.com docs on `Progress` dependency injection (FastMCP `task=True` decorator)
