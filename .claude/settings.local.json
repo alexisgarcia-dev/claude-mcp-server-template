@@ -1,16 +1,35 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(scripts/start-server.sh:*)",
-      "Bash(uv pip list:*)",
-      "WebFetch(domain:gofastmcp.com)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\ndocs\\(v0.1.0\\): comprehensive design doc + supporting documentation suite\n\nFiles added:\n- CLAUDE.md: navigation map for any future Claude session \\(133 lines\\)\n- docs/design-v0.1.0.md: architecture decisions, 7 sections, ~13500 words\n- docs/decisions.md: 10 ADR-light entries \\(architecture, pricing, security\\)\n- docs/runbook.md: bug-fix triage by symptom \\(~185 lines\\)\n- docs/sources.md: verified sources with verification dates \\(~60 lines\\)\n\nBrainstorm sessions:\n- J12 PM \\(2026-05-06\\): 7 architectural decisions via Superpowers brainstorming skill\n- J13 AM \\(2026-05-07\\): 5 design sections + 30+ technical fixes verified live\n  via FastMCP 3.2.4 introspection, mcp 1.27 schema verification,\n  Pydantic v2 model_dump behavior, MCP spec 2025-11-25, CVE-2025-49596 \\(CVSS 9.4\\),\n  CVE-2025-66416 \\(DNS rebinding default Python SDK\\)\n\nKnown limitation: design-v0.1.0.md sections 4-8 abbreviated due to write-time\ncontext constraints. Full architectural decisions captured in approved Q&A\nbrainstorm sessions and locked in docs/decisions.md \\(10 ADRs\\). Tracked for\nv0.1.1 design refresh — see GitHub issue \\(created next step\\).\n\nReady for /superpowers:writing-plans transition in fresh Claude Code session J13 PM.\nEOF\n\\)\")",
-      "Bash(uv run pytest:*)",
-      "Bash(.sprint.ps1 commit \"feat: implement config.py \\(Pydantic-settings Pattern C\\) + config.toml + 8 unit tests\")",
-      "Bash(powershell -File sprint.ps1:*)",
-      "Bash(uv run ruff check:*)",
-      "Bash(uv run uvicorn:*)",
-      "Bash(curl:*)"
-    ]
-  }
+﻿{
+    "permissions":  {
+                        "allow":  [
+                                      "Bash(scripts/start-server.sh:*)",
+                                      "Bash(uv pip list:*)",
+                                      "WebFetch(domain:gofastmcp.com)",
+                                      "Bash(git commit -m \"$\\(cat \u003c\u003c\u0027\u0027EOF\u0027\u0027\ndocs\\(v0.1.0\\): comprehensive design doc + supporting documentation suite\n\nFiles added:\n- CLAUDE.md: navigation map for any future Claude session \\(133 lines\\)\n- docs/design-v0.1.0.md: architecture decisions, 7 sections, ~13500 words\n- docs/decisions.md: 10 ADR-light entries \\(architecture, pricing, security\\)\n- docs/runbook.md: bug-fix triage by symptom \\(~185 lines\\)\n- docs/sources.md: verified sources with verification dates \\(~60 lines\\)\n\nBrainstorm sessions:\n- J12 PM \\(2026-05-06\\): 7 architectural decisions via Superpowers brainstorming skill\n- J13 AM \\(2026-05-07\\): 5 design sections + 30+ technical fixes verified live\n  via FastMCP 3.2.4 introspection, mcp 1.27 schema verification,\n  Pydantic v2 model_dump behavior, MCP spec 2025-11-25, CVE-2025-49596 \\(CVSS 9.4\\),\n  CVE-2025-66416 \\(DNS rebinding default Python SDK\\)\n\nKnown limitation: design-v0.1.0.md sections 4-8 abbreviated due to write-time\ncontext constraints. Full architectural decisions captured in approved Q\u0026A\nbrainstorm sessions and locked in docs/decisions.md \\(10 ADRs\\). Tracked for\nv0.1.1 design refresh â€” see GitHub issue \\(created next step\\).\n\nReady for /superpowers:writing-plans transition in fresh Claude Code session J13 PM.\nEOF\n\\)\")",
+                                      "Bash(uv run pytest:*)",
+                                      "Bash(.sprint.ps1 commit \"feat: implement config.py \\(Pydantic-settings Pattern C\\) + config.toml + 8 unit tests\")",
+                                      "Bash(powershell -File sprint.ps1:*)",
+                                      "Bash(uv run ruff check:*)",
+                                      "Bash(uv run uvicorn:*)",
+                                      "Bash(curl:*)",
+                                      "Bash(.\\sprint.ps1 *)",
+                                      "Bash(./sprint.ps1 *)",
+                                      "Bash(powershell -File sprint.ps1 *)",
+                                      "Bash(powershell -File .\\sprint.ps1 *)",
+                                      "Bash(uv run pytest *)",
+                                      "Bash(uv run ruff *)",
+                                      "Bash(uv run mypy *)",
+                                      "Bash(uv run uvicorn *)",
+                                      "Bash(curl *)",
+                                      "Bash(git add *)",
+                                      "Bash(git commit *)",
+                                      "Bash(git push *)",
+                                      "Bash(git log *)",
+                                      "Bash(git status *)",
+                                      "Bash(dir *)",
+                                      "Bash(ls *)"
+                                  ],
+                        "deny":  [
+
+                                 ]
+                    }
 }

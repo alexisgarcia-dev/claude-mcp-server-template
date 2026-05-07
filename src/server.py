@@ -50,9 +50,10 @@ mcp = FastMCP(
 )
 
 # Tools/Resources/Prompts registration happens here:
-from src.tools import get_recipe  # noqa: E402
+from src.tools import get_recipe, search_recipes  # noqa: E402
 
 get_recipe.register(mcp)
+search_recipes.register(mcp)
 
 if __name__ == "__main__":
     mcp.run()
