@@ -12,6 +12,7 @@ from fastmcp import FastMCP
 
 from src.config import Settings
 from src.pantry_client import PantryClient
+from src.telemetry import setup_telemetry
 
 # Lazy singleton accessor
 _pantry_client: PantryClient | None = None
@@ -36,12 +37,13 @@ async def lifespan(app):
     global _pantry_client
     config = Settings()
     _pantry_client = PantryClient(config)
-    # TODO J14 16h: tracer_provider = setup_telemetry(config)
+    tracer_provider = setup_telemetry(config)
     try:
         yield
     finally:
         await _pantry_client.aclose()
-        # TODO J14 16h: if tracer_provider: tracer_provider.shutdown()
+        if tracer_provider:
+            tracer_provider.shutdown()
 
 
 mcp = FastMCP(
