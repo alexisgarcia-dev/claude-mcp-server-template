@@ -8,7 +8,9 @@
       "Bash(uv run pytest:*)",
       "Bash(.sprint.ps1 commit \"feat: implement config.py \\(Pydantic-settings Pattern C\\) + config.toml + 8 unit tests\")",
       "Bash(powershell -File sprint.ps1:*)",
-      "Bash(uv run ruff check:*)"
+      "Bash(uv run ruff check:*)",
+      "Bash(uv run uvicorn:*)",
+      "Bash(curl:*)"
     ]
   }
 }
