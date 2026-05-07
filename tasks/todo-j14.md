@@ -43,10 +43,10 @@ Implement Tools #2/#3/#4 + Security batch. CUT GATE formel 17h via .\sprint.ps1 
 
 ## Verdict CUT GATE (a remplir apres sprint.ps1 status 17h)
 
-Verdict: [TBD]
-tools_done: [TBD]
-tests_pass_pct: [TBD]
-Action J15: [TBD]
+Verdict: KEEP_FULL_SCOPE
+tools_done: 4
+tests_pass_pct: 100.0% (48/48 passed)
+Action J15: Resource #5 + Prompt #6 GO. Full scope, zero cuts.
 
 ## Tool #4 generate_meal_plan -- spec Tasks primitive
 
@@ -75,7 +75,12 @@ async def generate_meal_plan(
 
 > Format: [HH:MM] | friction | regle/decision
 
-(a remplir par Claude Code au cours du sprint)
+[09:05] | sprint.ps1 ne fonctionne pas via bash tool (command not found) | Toujours utiliser PowerShell tool pour .\sprint.ps1, jamais Bash tool sur Windows
+[09:10] | Ruff B008 sur Progress() default arg dans register() | Ajouter # noqa: B008 sur la ligne Progress = Progress() — pattern requis par FastMCP DI, non contournable
+[09:15] | Ruff I001 import order ne respecte pas le noqa:I001 en ligne | Utiliser ruff check --fix pour auto-corriger, puis re-valider — ne pas tenter de corriger manuellement l'ordre isort
+[09:20] | async_request_hook vs request_hook dans HTTPXClientInstrumentor | PantryClient utilise httpx.AsyncClient → toujours async_request_hook, jamais request_hook (silencieux sinon)
+[09:25] | Security sub-tasks 4a + 4c + 4d deja implementes dans config.py avant J14 | Verifier l'etat du code existant avant d'implementer — evite doublons et regressions
+[09:30] | BulkUpdateResult existait deja dans models.py (nomme differemment du spec) | Toujours lire models.py avant d'ajouter de nouveaux modeles — spec peut diverger du code existant
 
 ## Out of scope J14
 
