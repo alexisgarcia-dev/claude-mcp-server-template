@@ -1,0 +1,20 @@
+# PantryMCP Server Configuration
+# Secrets go in .env (gitignored). Structure goes here (committed).
+
+dev_mode = true  # Allows empty api_key for localhost:8001 mock
+
+[api]
+base_url = "http://localhost:8001"
+timeout = 30
+max_retries = 3
+backoff_factor = 2.0
+
+[oauth]
+enabled = false
+# issuer = "https://auth.example.com"  # Enable in v0.2.0
+
+[telemetry]
+enabled = true
+otlp_endpoint = "http://localhost:4318/v1/traces"
+service_name = "pantry-mcp"
+sampling_ratio = 1.0  # Override to 0.1 in production: PANTRY_TELEMETRY__SAMPLING_RATIO=0.1
