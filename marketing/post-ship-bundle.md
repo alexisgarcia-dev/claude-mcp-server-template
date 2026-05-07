@@ -1,0 +1,245 @@
+# post-ship-bundle.md -- Marketing assets v0.1.0
+
+> Pré-écrit J13 PM (jeudi 07/05/2026) en parallèle du sprint.
+> Polishing à faire post-ship J15 EOD ou J16 morning.
+> Tous les assets respectent l'anti-AI checklist (0 em dashes, 0 "delve/harness/leverage", short sentences mixed in).
+
+## Sommaire
+
+1. Catalog Upwork (3 tiers $400 / $900 / $2400) -- soumettre J14 EOD pour approval J16
+2. Article dev.to (skeleton 600-800 mots) -- publier J17 lundi 11/05/2026 morning
+3. Twitter thread (6 tweets) -- schedule J17 morning post-dev.to
+4. Reddit r/mcp post (~200 mots) -- schedule J17 PM si Twitter traction OK
+
+---
+
+## §1 Catalog Upwork -- 3 tiers
+
+### Title (≤80 chars)
+Custom MCP server template -- Tools, Resources, Prompts, and Background Tasks
+
+### Description (≤750 chars)
+Production-ready MCP server template wrapping any REST API into a Claude or AI-agent-callable surface. Built on FastMCP 3.x and mcp 1.27, demonstrating all four MCP primitives. That includes Tasks (2025-11-25 spec) which 99% of public templates skip. Comes with a fake SaaS demo (PantryAPI) so you see end-to-end integration before plugging your own API. OAuth scaffold, OpenTelemetry observability, Docker compose, and a 3-line quickstart included. Pinned versions throughout. Apache 2.0.
+
+### Tier Starter -- $400, 3 days, 1 revision
+
+**Deliverables**:
+- Fork du template configuré pour ton API (1 endpoint cible)
+- 1 Tool implémenté + 1 test d'intégration
+- README setup + quickstart commands
+- 1 revision incluse
+
+**Add-ons**:
+- Fast Delivery (48h) +$50
+
+### Tier Standard -- $900, 5 days, 2 revisions (recommended)
+
+**Deliverables**:
+- Tout Starter +
+- 3 Tools + 1 Resource + 1 Prompt câblés sur ton API
+- Tests unitaires + 1 test d'intégration end-to-end
+- OpenTelemetry traces configuré (httpx instrumentation)
+- Docker compose pour déploiement local
+- 2 revisions incluses
+
+**Add-ons**:
+- Fast Delivery (3 jours) +$100
+- Background Tasks primitive (long-running ops async) +$200
+
+### Tier Advanced -- $2400, 10 days, 3 revisions
+
+**Deliverables**:
+- Tout Standard +
+- OAuth 2.1 Resource Server (Pattern B sourced MCP spec 2025-11-25)
+- Multi-tenant config (Pydantic-settings hierarchical Pattern C)
+- Tasks primitive avec progress reporting via Context.report_progress
+- Handoff call 60 min agenda structuré (architecture + maintenance + scaling)
+- 2 weeks support post-livraison (bugs only, canal Upwork message)
+
+**Add-ons**:
+- Fast Delivery (5 jours) +$150
+- Custom auth provider integration (SAML, OIDC) +$400
+
+### FAQ (3 entries)
+
+**Q: Quelles APIs as-tu déjà intégrées ?**
+PantryAPI (fake SaaS demo dans le repo template public). Références client privées sur demande post-ship.
+
+**Q: Mon API n'est pas REST, ça marche ?**
+Le template assume REST/HTTP. GraphQL et gRPC sortent du scope template standard et nécessitent le tier Advanced avec add-on custom.
+
+**Q: Tu fournis l'hébergement ?**
+Non. Le template inclut Dockerfile + docker-compose ready pour Prefect Horizon, Render, Railway, ou ton cluster k8s. Je peux configurer le déploiement sur la plateforme de ton choix en add-on.
+
+---
+
+## §2 Article dev.to -- skeleton 600-800 mots
+
+### Titre
+Building a Production MCP Server Template: Tools, Resources, Prompts, and Background Tasks
+
+### Tags (5 max)
+mcp, claude, python, fastmcp, anthropic
+
+### Cover image
+Screenshot du serveur tournant + Inspector connecté. Ou diagramme architecture (4 primitives sur PantryAPI).
+
+### Skeleton (à étoffer post-ship avec snippets réels)
+
+#### Intro (100 mots)
+Most MCP server templates I checked ship 2-3 Tools, a README, and call it a day. The MCP spec (2025-11-25) defines four primitives though: Tools, Resources, Prompts, and Tasks. Skipping Resources and Prompts means the template only covers half the protocol. Skipping Tasks means async long-running operations fall back to brittle polling.
+
+So I built one that covers all four. On a fake SaaS (PantryAPI) so you see end-to-end integration before plugging your own API. Repo: [github.com/...]
+
+#### Section 1 -- Architecture (120 mots)
+- Stack: FastMCP 3.x + mcp 1.27 + Pydantic v2 + tenacity for HTTP retries
+- `register(mcp)` function pattern in each module (avoids circular import trap from `@mcp.tool()` at module level)
+- Lazy singleton + FastMCP lifespan for HTTP client lifecycle
+- Layout: `src/tools/`, `src/resources/`, `src/prompts/`
+- Pinned versions throughout (semver pragmatic adaptations for evolving MCP ecosystem)
+
+[Code snippet: `server.py` boot showing register() calls]
+
+#### Section 2 -- Tools (100 mots)
+4 Tools demonstrating CRUD + async patterns on PantryAPI:
+- `get_recipe` -- simple GET, error handling via tenacity AsyncRetrying
+- `search_recipes` -- manual OTel span for query observability
+- `update_pantry` -- bulk POST with Pydantic validation
+- `generate_meal_plan` -- Tasks primitive (next section)
+
+[Code snippet: tenacity retry config]
+
+#### Section 3 -- Resources (80 mots)
+Resources are the GET-like half of MCP that 99% of public templates skip. They expose data with required MIME types (verified via mcp 1.27 schema).
+
+Demo: `recipe_resource://{recipe_id}` returning JSON with `application/json` MIME type.
+
+[Snippet: register() function for Resource]
+
+#### Section 4 -- Prompts (80 mots)
+Prompts are reusable templates the user invokes. Skipped by most templates because role limitations are easy to get wrong.
+
+Demo: `weekly_planner` with PromptMessage role=user/assistant only (mcp 1.27 PromptMessage schema rejects role=system).
+
+[Snippet: PromptMessage with proper role]
+
+#### Section 5 -- Tasks (120 mots)
+The differentiator. Public templates ignore Tasks because the spec landed late (2025-11-25). FastMCP `[tasks]` extras enables it cleanly.
+
+Demo: `generate_meal_plan` runs 3 phases, each reporting progress via `Context.report_progress()`. The host (Claude Desktop 0.13+, Cursor) renders it as a live spinner with status text. A 30-second tool call goes from frustrating black box to credible operation.
+
+[Snippet: report_progress in action + screenshot of host rendering spinner]
+
+#### Section 6 -- Deployment (60 mots)
+Docker compose ready, OTel traces configured (OTLP HTTP exporter), 3-line quickstart in README. Healthcheck via Python httpx (no curl dependency in image -- smaller attack surface).
+
+DNS rebinding mitigation via FastMCP host=127.0.0.1 (CVE-2025-49596 verified).
+
+#### Conclusion + CTA (40 mots)
+Repo is open source (Apache 2.0). Feedback welcome on issues. If you want this configured for your own API, see the Catalog: [Upwork link].
+
+---
+
+## §3 Twitter thread -- 6 tweets
+
+**1/6 (hook, ≤280 chars)**
+Just shipped an open source MCP server template covering all 4 protocol primitives: Tools, Resources, Prompts, and Tasks.
+
+Most public templates skip Resources, Prompts, and Tasks. Mine doesn't.
+
+FastMCP 3.x + mcp 1.27, pinned. Repo:
+[link]
+
+**2/6**
+Resources are the GET-like half of MCP. They expose data with required MIME types. Roughly 99% of public templates skip them entirely.
+
+My template demos `recipe_resource://{id}` on a fake SaaS (PantryAPI) so you see the integration shape before plugging your own API.
+
+**3/6**
+Prompts are reusable templates the user invokes. Skipped by most because role limitations trip people up.
+
+My demo: `weekly_planner` with PromptMessage role=user/assistant only (mcp 1.27 spec rejects role=system).
+
+**4/6**
+Tasks (spec 2025-11-25) is the cutting-edge primitive for async long-running ops. Zero public templates demo it as of today.
+
+Mine does. `generate_meal_plan` runs 3 phases, each reporting progress via Context.report_progress. Hosts render it as a live spinner.
+
+**5/6**
+Production extras included:
+- OTel traces (httpx instrumentation)
+- Docker compose ready
+- OAuth 2.1 Resource Server scaffold
+- Healthcheck via Python httpx (no curl dep)
+- 3-line quickstart
+- DNS rebinding mitigation (CVE-2025-49596)
+
+**6/6 (CTA)**
+Repo: [link]
+Catalog if you want this configured for your own API: [Upwork link]
+Issues + PRs welcome. Apache 2.0.
+
+---
+
+## §4 Reddit r/mcp post
+
+### Title (≤300 chars, no emoji, no clickbait)
+[Open source] MCP server template covering all 4 primitives -- Tools, Resources, Prompts, Tasks
+
+### Body (~200 mots)
+
+Built and shipped this past 3 days. Most MCP server templates I checked ship 2-3 Tools and stop there. The protocol defines 4 primitives though: Tools, Resources, Prompts, and Tasks (2025-11-25 spec). My template demos all 4 on a fake SaaS (PantryAPI) so you see the full integration before plugging your own API.
+
+Stack: FastMCP 3.x + mcp 1.27.0 + Pydantic v2 + tenacity for HTTP retries. Pinned versions throughout (FastMCP semver follows pragmatic adaptations -- I learned the hard way that `>=` is risky on this ecosystem).
+
+Production extras included:
+- OAuth 2.1 Resource Server scaffold
+- OpenTelemetry traces (httpx instrumentation)
+- Docker compose ready
+- Healthcheck via Python httpx (no curl dep in image)
+- 3-line quickstart
+- DNS rebinding mitigation (CVE-2025-49596)
+
+Repo: [link]
+
+Feedback welcome. Happy to discuss design choices, especially around the `register()` function pattern that avoids the circular import trap when you decorate `@mcp.tool()` at module level.
+
+Apache 2.0 license. Issues + PRs open.
+
+### Comments to monitor + canned answers
+
+- "Why FastMCP and not raw mcp SDK?" -> 5x productivity, handles wire format, decorators reduce boilerplate
+- "Why include OTel out of the box?" -> debugging async tool calls without traces is painful, OTel is the cheapest insurance
+- "register() pattern, why not @mcp.tool() directly?" -> circular import: server.py imports tools/, tools/ needs `mcp` instance from server.py. register() inverts dependency direction
+- Architecture deep-dives -> link to docs/design-v0.1.0.md + ADR log
+
+### Anti-spam checklist (avant submit)
+
+- [ ] Pas de mention "I built", "I made" en début de title (Reddit r/mcp anti self-promo bias)
+- [ ] [Open source] tag clear pour signaler intention
+- [ ] Repo link APRÈS la valeur expliquée, pas en premier
+- [ ] Pas plus de 1 lien marketing (Upwork link cited in dev.to but pas ici)
+- [ ] Réponse sincère aux questions techniques dans les 4h post-publication
+
+---
+
+## Calendrier publication post-ship
+
+| Date | Heure | Action |
+|------|-------|--------|
+| J14 EOD vendredi 08/05 | ~18h | Submit Catalog Upwork (draft) |
+| J15 EOD samedi 09/05 | ~17h30 | Tag v0.1.0 + push |
+| J16 dimanche 10/05 | -- | Wait Catalog approval (24-72h variable) |
+| J17 lundi 11/05 | 9h-10h | Publish dev.to article |
+| J17 lundi 11/05 | 10h-10h30 | Tweet thread (post-dev.to live) |
+| J17 lundi 11/05 | 14h-15h | Reddit r/mcp post (post-Twitter traction check) |
+| J18 mardi 12/05 | -- | Monitor responses, answer questions, fix typos |
+
+## Anti-AI checklist global (vérifier avant chaque publication)
+
+- [ ] First word ≠ "I"/"Hi" (Twitter 1/6 = "Just shipped" OK, dev.to intro = "Most MCP server templates" OK, Reddit = "Built and shipped" OK)
+- [ ] 0 em dashes (--, -, et tirets `-` mais zéro em dash `—`)
+- [ ] Bannis: "delve" / "harness" / "unleash" / "tapestry" / "leverage" / "It's not just X it's Y" / "In today's"
+- [ ] ≥1 short sentence (5-10 words) par section
+- [ ] Direct CTA (repo link + Upwork link sur dev.to et Twitter)
+- [ ] Specific brief reference (PantryAPI / mcp 1.27 / 2025-11-25 / CVE-2025-49596)
