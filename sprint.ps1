@@ -1,10 +1,20 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Orchestrateur sprint MCP server template v0.1.0 (J13-J15).
+    Orchestrateur sprint MCP server template v0.1.0 (J13-J15) -- v2.1.
 .DESCRIPTION
+    v2.1 changes vs v2:
+    - Fix: pydocket s'importe comme `import docket` (PyPI name != module name)
+    - Version retrieved via importlib.metadata.version('pydocket')
+
+    v2 changes vs v1:
+    - Smoke test now writes to temp file + capture output (was silent)
+    - Smoke test imports fastmcp.dependencies.Progress + fastmcp.server.tasks.TaskConfig
+      + docket version (was missing -- false positive on Tasks primitive)
+    - Smoke test imports OTel modules (was missing -- could mask broken otlp exporter)
+
     Subcommands:
-        preflight  - Install deps + verify imports + check Python >=3.11
+        preflight  - Install deps + verify imports (Tasks API + OTel) + Python >=3.11
         status     - Verdict cut-decision (tools/resources/prompts/tests)
         commit     - Atomic commit: ruff + mypy + pytest + git add/commit/push
         ship       - Integration tests + Quickstart e2e on clean dir + tag v0.1.0
@@ -30,7 +40,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 function Invoke-Preflight {
-    Write-Host "=== Pre-flight gate ===" -ForegroundColor Cyan
+    Write-Host "=== Pre-flight gate v2.1 ===" -ForegroundColor Cyan
 
     Write-Host "[1/3] Installing runtime deps..." -ForegroundColor Yellow
     uv add 'fastmcp[tasks]>=3.0' 'pydantic-settings>=2.0' 'tenacity>=9.0' `
@@ -40,7 +50,8 @@ function Invoke-Preflight {
            'fastapi>=0.115' 'uvicorn>=0.30' 'httpx>=0.27'
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAIL: uv add (runtime)" -ForegroundColor Red
-        Write-Host "Mitigation possible: Cyclopts v4 docutils issue -> uv add 'cyclopts>=5.0.0a1'" -ForegroundColor Yellow
+        Write-Host "Mitigation Cyclopts v4 docutils: uv add 'cyclopts>=5.0.0a1'" -ForegroundColor Yellow
+        Write-Host "Mitigation fakeredis 2.35.0: uv add 'fakeredis<2.35.0'" -ForegroundColor Yellow
         exit 1
     }
 
@@ -51,21 +62,51 @@ function Invoke-Preflight {
         exit 1
     }
 
-    Write-Host "[3/3] Import smoke test..." -ForegroundColor Yellow
+    Write-Host "[3/3] Import smoke test (visible output)..." -ForegroundColor Yellow
+
+    # v2 fix: write to temp file instead of -c heredoc (was silent under PowerShell)
+    # v2.1 fix: pydocket package -> import docket (different PyPI/module name)
+    $smokeFile = "$env:TEMP\preflight_smoke.py"
     $smokeTest = @'
 import sys
 assert sys.version_info >= (3, 11), f"Python 3.11+ required, got {sys.version_info}"
+
+# Core stack
 from pydantic_settings import BaseSettings
 from fastmcp import FastMCP, Context
 from tenacity import AsyncRetrying
 import mcp
+
+# Tasks primitive (the actual differentiator -- verified gofastmcp.com/servers/tasks)
+# Note: PyPI package = pydocket, Python module = docket
+from fastmcp.dependencies import Progress
+from fastmcp.server.tasks import TaskConfig
+import docket  # noqa: F401  -- smoke check only
+from importlib.metadata import version as _pkg_version
+
+# OTel real imports (smoke check exporter chain)
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+
 print(f"Python={sys.version.split()[0]}")
-print(f"mcp={mcp.__version__}")
+print(f"mcp={_pkg_version('mcp')}")
+print(f"pydocket={_pkg_version('pydocket')}")
+print(f"Tasks API: Progress + TaskConfig + docket -> OK")
+print(f"OTel: trace + TracerProvider + OTLPSpanExporter + HTTPXClientInstrumentor -> OK")
 print("Pre-flight OK")
 '@
-    uv run python -c $smokeTest
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "FAIL: import smoke test" -ForegroundColor Red
+    $smokeTest | Out-File -FilePath $smokeFile -Encoding utf8 -NoNewline
+    $smokeOutput = uv run python $smokeFile 2>&1
+    $smokeExit = $LASTEXITCODE
+    Remove-Item $smokeFile -ErrorAction SilentlyContinue
+
+    Write-Host $smokeOutput
+
+    if ($smokeExit -ne 0) {
+        Write-Host "FAIL: import smoke test (exit=$smokeExit)" -ForegroundColor Red
+        Write-Host "Read output above for the failed import." -ForegroundColor Yellow
         exit 1
     }
 
