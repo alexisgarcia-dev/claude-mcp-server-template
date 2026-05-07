@@ -7,6 +7,14 @@ Avoids FastMCP schema generation duplication.
 from pydantic import BaseModel, Field
 
 
+class PantryItem(BaseModel):
+    """Pantry inventory item for bulk update operations."""
+
+    name: str
+    quantity: int = Field(ge=0)
+    unit: str
+
+
 class Recipe(BaseModel):
     """Recipe model matching PantryAPI schema."""
 
