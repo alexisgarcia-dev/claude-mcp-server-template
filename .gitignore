@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Brainstorm artifacts (Superpowers skill local-only outputs)
+.superpowers/
