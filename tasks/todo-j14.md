@@ -8,16 +8,16 @@ Implement Tools #2/#3/#4 + Security batch. CUT GATE formel 17h via .\sprint.ps1 
 
 ## Sprint plan J14 9h-17h
 
-- [ ] **9h-11h** src/tools/search_recipes.py + tests/unit/test_search_recipes.py (Tool #2)
-- [ ] **11h-13h** src/tools/update_pantry.py + tests/unit/test_update_pantry.py (Tool #3, bulk POST)
-- [ ] **14h-16h** src/tools/generate_meal_plan.py + tests (Tool #4, Tasks primitive differenciateur #3)
-- [ ] **16h-17h** Security batch: SecretStr OTel masking + dev_mode warning + OAuth boot validator
+- [x] **9h-11h** src/tools/search_recipes.py + tests/unit/test_search_recipes.py (Tool #2)
+- [x] **11h-13h** src/tools/update_pantry.py + tests/unit/test_update_pantry.py (Tool #3, bulk POST)
+- [x] **14h-16h** src/tools/generate_meal_plan.py + tests (Tool #4, Tasks primitive differenciateur #3)
+- [x] **16h-17h** Security batch: SecretStr OTel masking + dev_mode warning + OAuth boot validator
 
 ## Mid-session checkpoints
 
-- [ ] **11h00** /sprint:check -- scope drift check
-- [ ] **13h00** /sprint:check -- lunch check
-- [ ] **17h00** .\sprint.ps1 status -- **CUT GATE FORMEL** (decision binaire, run tools/cut-decision.py)
+- [x] **11h00** /sprint:check -- scope drift check
+- [x] **13h00** /sprint:check -- lunch check
+- [x] **17h00** .\sprint.ps1 status -- **CUT GATE FORMEL** (decision binaire, run tools/cut-decision.py)
 
 ## CUT GATE J14 17h -- decision binaire
 
@@ -32,14 +32,14 @@ Implement Tools #2/#3/#4 + Security batch. CUT GATE formel 17h via .\sprint.ps1 
 
 ## EOD criteria J14 (must be true apres CUT GATE 17h)
 
-- [ ] Tool #2 search_recipes implementee + tested
-- [ ] Tool #3 update_pantry implementee + tested (bulk POST, Pydantic model_dump mode json)
-- [ ] Tool #4 generate_meal_plan implementee + tested (Tasks + Progress from fastmcp.dependencies)
-- [ ] Security batch done (SecretStr OTel masking, dev_mode stderr warning, OAuth boot validator)
-- [ ] .\sprint.ps1 status run et verdict enregistre dans cette section
-- [ ] uv run pytest -q exit 0
-- [ ] 4+ commits atomiques via sprint.ps1
-- [ ] Lessons learned mise a jour ci-dessous
+- [x] Tool #2 search_recipes implementee + tested
+- [x] Tool #3 update_pantry implementee + tested (bulk POST, Pydantic model_dump mode json)
+- [x] Tool #4 generate_meal_plan implementee + tested (Tasks + Progress from fastmcp.dependencies)
+- [x] Security batch done (SecretStr OTel masking, dev_mode stderr warning, OAuth boot validator)
+- [x] .\sprint.ps1 status run et verdict enregistre dans cette section
+- [x] uv run pytest -q exit 0
+- [x] 4+ commits atomiques via sprint.ps1
+- [x] Lessons learned mise a jour ci-dessous
 
 ## Verdict CUT GATE (a remplir apres sprint.ps1 status 17h)
 
