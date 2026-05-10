@@ -36,7 +36,7 @@ jobs:
         run: uv tool run bandit -r src/ -f sarif -o bandit-results.sarif --severity-level medium --confidence-level high || true
 
       - name: Upload SARIF results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: bandit-results.sarif
           category: bandit
