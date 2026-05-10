@@ -1,0 +1,74 @@
+name: Bug Report
+description: Report a defect in the MCP server template
+title: "[bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report.
+        Please fill out the sections below — incomplete reports take longer to triage.
+
+  - type: input
+    id: version
+    attributes:
+      label: Template version
+      description: e.g. v0.1.0, or commit SHA if running from main
+      placeholder: v0.1.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where does the bug occur?
+      options:
+        - Local stdio (Claude Desktop / Cursor / Windsurf)
+        - Local Streamable HTTP (uv run python -m src.server)
+        - Docker compose (3-service stack)
+        - Production / staging deployment
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: Minimum sequence to trigger the bug
+      placeholder: |
+        1. git clone ...
+        2. docker compose up
+        3. curl -X POST ... with Bearer demo-readwrite
+        4. observe ...
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include error output, stack trace, or relevant logs
+      render: shell
+    validations:
+      required: true
+
+  - type: input
+    id: python_version
+    attributes:
+      label: Python version
+      placeholder: e.g. 3.11.7
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: e.g. Ubuntu 24.04, macOS 14.5, Windows 11

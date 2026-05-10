@@ -39,6 +39,8 @@
 **Consequences**: Production observability out-of-box. Tier $2400 differentiator.
 **See**: design-v0.1.0.md §6 + Section 4 Tool #2/#4
 
+> **Note 2026-05-10**: The canonical Docker Hub tag is `jaegertracing/all-in-one:1.62.0` (full SemVer). The "1.62" reference above refers to the minor-version line; the actually-pinned tag in `docker-compose.yml` uses the full `1.62.0` for reproducibility.
+
 ## ADR-006 — Test Strategy Hybrid C (Unit MockTransport + Integration native MCP utilities)
 **Date**: 2026-05-06
 **Status**: Locked

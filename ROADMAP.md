@@ -1,64 +1,80 @@
 # Roadmap
 
-This roadmap reflects MCP spec evolution and production-survival priorities.
-Sourced from MCP 2026 official roadmap (March 2026), MCP 2025-11-25 specification, and production deployment feedback.
+**Status: v1.0.0 is the stable reference release.** Maintenance is community-driven from this point forward — pull requests, forks, and discussion welcome.
 
-## v0.1.0 — Production-survival foundation (May 2026, current)
+This roadmap reflects MCP spec evolution and production-survival priorities, sourced from the MCP 2026 official roadmap, the MCP 2025-11-25 specification, and production deployment feedback.
+
+## v1.0.0 — Production-survival foundation (current, May 2026)
 
 The version that doesn't die in production.
 
-- 4 demo tools, 1 demo resource, 1 demo prompt (PantryAPI)
+- 4 demo tools, 1 demo resource, 1 demo prompt (PantryAPI placeholder)
 - Streamable HTTP transport (mandatory for remote deployment, MCP spec 2026)
 - Static bearer token authentication (preview/dev — `StaticTokenVerifier`)
 - OpenTelemetry observability pipeline (custom exporter, OTLP HTTP)
 - Pinned dependencies + `uv.lock` committed
 - Docker compose with Python httpx upstream healthcheck (no curl dependency)
-- e2e quickstart validated on clean environment
+- Container hardening (`no-new-privileges`, `cap_drop: ALL` services applicatifs)
+- GitHub Actions CI matrix Python 3.11/3.12/3.13 + CodeQL + Bandit + Dependabot
+- 10 ADR-light decisions documented in [`docs/decisions.md`](./docs/decisions.md)
+- End-to-end quickstart validated empirically pre-push and post-push (Layer 4 clone fresh from GitHub)
 
-## v0.2.0 — Auth maturation (target end May 2026)
+## Future directions (contributions welcome)
 
-For internet-exposed deployments.
+These are areas where the template could grow. The maintainer is not committing to ship these — pull requests and forks are welcome. Open a GitHub issue with the label `roadmap` and a use case to discuss.
 
-- OAuth 2.1 + PKCE flow (FastMCP `JWTVerifier` + `OAuthProvider`)
-- Reference integrations: Auth0, WorkOS, Azure Entra ID
-- JWKS rotation handling
-- Migration guide from `StaticTokenVerifier` (1-line change)
-- Cookiecutter template generator (reduces fork-and-customize friction)
+### v1.1.x line — conditional release target
 
-## v0.3.0 — Audit-ready & async maturity (target end June 2026)
+**Trigger conditions** (any one suffices):
+- MCP specification publishes a revision later than `2025-11-25` with breaking changes that affect tool/resource/prompt registration, transport, or auth surface.
+- FastMCP ships a `4.x` major with non-trivial migration friction from `3.2.x`.
+- A community PR ships a substantial production-pattern improvement (e.g., OAuth 2.1 + PKCE reference integration, structured audit log) with maintainer-grade test coverage.
 
-For enterprise observability and long-running operations.
+**Tentative window**: Q4 2026 evaluation if any trigger fires before then. No commitment otherwise — `v1.0.x` remains the stable reference until then.
 
-- Structured audit log (tool invocation tracing with parameters + results)
-- Full SEP-1686 Tasks primitive RPC compliance: `tasks/get`, `tasks/result`, `tasks/list`, `tasks/cancel`, `notifications/tasks/status`
-- Tool versioning support (mcp 1.28+ metadata `version` field)
-- Migration path from `@mcp.tool(task=True)` async pattern to SEP-1686 RPC
+**What `v1.1.x` would NOT change**:
+- The five production-survival pillars list (those are the project's identity).
+- Pinned-version philosophy for reproducibility (only the pins move).
+- "Out of scope by design" boundaries.
 
-## v0.4.0 — Horizontal scale (target end July 2026)
+### Authentication maturation
 
-For multi-instance deployment.
+- **OAuth 2.1 + PKCE** flow via FastMCP `JWTVerifier` + `OAuthProvider`, with reference integrations for Auth0, WorkOS, Azure Entra ID
+- **JWKS rotation handling**
+- **Migration guide** from `StaticTokenVerifier` (single-line change pattern)
+- **Per-tool scope guards** (currently both demo tokens carry `read:pantry`; production deployments would gate `update_pantry` etc. behind `write:pantry`)
+- **Cookiecutter template generator** to reduce fork-and-customize friction
 
-- Stateless session mode (`stateless_http=True` + external state store)
-- `.well-known/mcp-server-metadata.json` discovery endpoint (MCP Server Cards)
-- Load-balancer-ready deployment patterns
-- Reference Kubernetes manifest
+### Audit-ready & async maturity
 
-## v0.5.0 — Multi-agent ready (target October 2026)
+- **Structured audit log** (tool invocation tracing with parameters and results)
+- **Full SEP-1686 Tasks primitive RPC compliance**: `tasks/get`, `tasks/result`, `tasks/list`, `tasks/cancel`, `notifications/tasks/status` (when MCP spec stabilizes this proposal)
+- **Tool versioning support** (mcp 1.28+ metadata `version` field)
 
-For agent-to-agent coordination.
+### Horizontal scale
 
-- A2A protocol bridge (when Linux Foundation AAIF spec stabilizes Q3 2026)
-- MCP Registry publishable manifest
-- Server-as-agent capability (when MCP roadmap recursive servers ships)
+- **Stateless session mode** (`stateless_http=True` + external state store)
+- **`.well-known/mcp-server-metadata.json`** discovery endpoint (MCP Server Cards)
+- **Reference Kubernetes manifest**
 
----
+### Multi-agent ready
 
-## Versioning policy
+- **A2A protocol bridge** when the Linux Foundation AAIF specification stabilizes
+- **MCP Registry publishable manifest**
 
-- Backward compatibility within minor versions
-- Migration guide for breaking changes between minor versions
-- Deprecation window: 1 minor version minimum
+## Out of scope by design
 
-## How to influence this roadmap
+These are intentionally not part of this template's scope. Other projects address them well:
 
-Open a GitHub issue with the label `roadmap` and a use case. Real-world deployment feedback weighs more than feature requests.
+- **Multi-tenant session stores at scale** — see [IBM ContextForge](https://github.com/IBM/mcp-context-forge) for a gateway-grade solution
+- **Plugin system / Admin UI** — gateway-class needs are not the focus of a lightweight template
+- **Rate limiting middleware** — recommended pattern is to put nginx, Caddy, or Traefik in front of this server
+- **Production-grade Identity Provider** — drop in your own (Keycloak, Authentik, Auth0, Okta). The template provides the integration surface, not the IdP itself.
+
+## How to contribute
+
+If you'd like to ship one of the future directions: open an issue first to discuss the approach, then submit a PR linked to the issue. See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+
+## Versioning policy (frozen v1.0.0)
+
+This is the stable reference release. Future major versions, if any, would follow SemVer with documented breaking changes and migration guides.

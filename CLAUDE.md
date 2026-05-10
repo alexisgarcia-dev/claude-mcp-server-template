@@ -1,6 +1,6 @@
 # claude-mcp-server-template
 
-> Plug-and-play REST API → MCP wrapper template. v0.1.0 ships with PantryAPI mock demo.
+> Plug-and-play REST API → MCP wrapper template. v1.0.0 ships with PantryAPI mock demo.
 
 ## What is this project?
 
@@ -97,10 +97,10 @@ claude-mcp-server-template/
 - **HTTP retry**: tenacity AsyncRetrying (not httpx native — verified insufficient)
 - **Tasks primitive**: Native FastMCP `@mcp.tool(task=True)`, in-process pydocket worker
 - **Observability**: OpenTelemetry hybrid (auto httpx + manual pédagogique spans Tool #2/#4)
-- **Security**: API key v0.1.0, OAuth stub v0.2.0. DNS rebinding mitigated via host="127.0.0.1" default. SecretStr Pydantic + OTel header masking.
+- **Security**: API key v1.0.0, OAuth stub v0.2.0. DNS rebinding mitigated via host="127.0.0.1" default. SecretStr Pydantic + OTel header masking.
 - **Testing**: Hybrid C — unit MockTransport + integration native MCP utilities. 70% per-file floor coverage.
 
-## Sprint timeline (v0.1.0 ship)
+## Sprint timeline (v1.0.0 ship)
 
 - J13 jeudi 07/05/2026: Config + HTTP client + Tool #1 (5h)
 - J14 vendredi 08/05/2026: Tools #2 + #3 + #4 + Security batch (6h)
@@ -127,7 +127,7 @@ claude-mcp-server-template/
 
 ## Reading order priority for bug fixes
 
-bug → `docs/runbook.md` (find symptom)  
-→ if pointer to design § → `docs/design-v0.1.0.md` (deep context)  
-→ if needs source verification → `docs/sources.md` (re-verify if old)  
+bug → `docs/runbook.md` (find symptom)
+→ if pointer to design § → `docs/design-v0.1.0.md` (deep context)
+→ if needs source verification → `docs/sources.md` (re-verify if old)
 → if architectural question → `docs/decisions.md` (ADR rationale)

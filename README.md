@@ -2,10 +2,14 @@
 
 > Production-survival MCP server template — for servers that don't die in production.
 
+[![CI](https://github.com/alexisgarcia-dev/claude-mcp-server-template/workflows/CI/badge.svg)](https://github.com/alexisgarcia-dev/claude-mcp-server-template/actions)
+[![CodeQL](https://github.com/alexisgarcia-dev/claude-mcp-server-template/workflows/CodeQL/badge.svg)](https://github.com/alexisgarcia-dev/claude-mcp-server-template/actions)
 [![MCP Spec 2025-11-25](https://img.shields.io/badge/MCP%20Spec-2025--11--25-blue)](https://modelcontextprotocol.io/specification/2025-11-25)
-[![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue.svg)](https://www.python.org/downloads/)
 [![FastMCP 3.x](https://img.shields.io/badge/FastMCP-3.x-green.svg)](https://gofastmcp.com)
 [![License MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+![Jaeger UI showing MCP tools/list trace from end-to-end validated quickstart](docs/images/jaeger-ui.png)
 
 A Python MCP server template built around the patterns that distinguish 9% healthy from 52% dead MCP servers in production (April 2026 community scan, 2,181 endpoints).
 
@@ -17,7 +21,7 @@ Most MCP server templates ship the spec primitives. This one ships the productio
 2. **Bearer token authentication** — `StaticTokenVerifier` for preview, migration path to `JWTVerifier` documented
 3. **OpenTelemetry observability** — OTLP exporter wired in `lifespan`, MCP semantic conventions
 4. **Pinned dependencies + `uv.lock`** — reproducible across dev, staging, production
-5. **Upstream healthcheck** — Docker `HEALTHCHECK` validates the upstream API connectivity, not just the process
+5. **JSON-RPC healthcheck** — Docker `HEALTHCHECK` runs an authenticated `tools/list` JSON-RPC call validating bearer auth + Streamable HTTP transport + tool registration in one shot. Catches misconfig and protocol failure, not just process crash. (Upstream API connectivity validation is a future direction — see [ROADMAP.md](./ROADMAP.md).)
 
 If `git clone && docker compose up && curl` doesn't work on a fresh machine, this template has failed its primary contract.
 
@@ -26,21 +30,32 @@ If `git clone && docker compose up && curl` doesn't work on a fresh machine, thi
 ```bash
 git clone https://github.com/alexisgarcia-dev/claude-mcp-server-template.git
 cd claude-mcp-server-template
-docker compose up
+docker compose up -d
 ```
 
-The server is now reachable at `http://localhost:8000/mcp/` with Streamable HTTP transport.
+The server is reachable at `http://localhost:8000/mcp` with Streamable HTTP transport. Bearer auth: `demo-readonly` (read access) or `demo-readwrite` (write).
 
-Test a tool call (token = `demo-readwrite` for full access):
+List available tools using the FastMCP Python client:
 
-```bash
-curl -X POST http://localhost:8000/mcp/ \
-  -H "Authorization: Bearer demo-readwrite" \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```python
+from fastmcp import Client
+import asyncio
+
+async def main():
+    async with Client(
+        "http://127.0.0.1:8000/mcp",
+        headers={"Authorization": "Bearer demo-readonly"},
+    ) as client:
+        tools = await client.list_tools()
+        for t in tools:
+            print(f"  {t.name}: {t.description}")
+
+asyncio.run(main())
 ```
 
-OpenTelemetry traces are visible at `http://localhost:16686` (Jaeger UI).
+OpenTelemetry traces visible at `http://localhost:16686` (Jaeger UI).
+
+**Manual HTTP protocol note** — MCP Streamable HTTP transport requires a 2-step handshake (`initialize` → capture `Mcp-Session-Id` response header → `tools/list` with that session ID). The fastmcp Client SDK handles this transparently. For raw `curl` / PowerShell usage, see [docs/manual-http-handshake.md](./docs/manual-http-handshake.md).
 
 ## What's inside
 
@@ -53,6 +68,8 @@ OpenTelemetry traces are visible at `http://localhost:16686` (Jaeger UI).
 The demo wraps a fake SaaS (`PantryAPI`, included as `pantry_mock_api.py`) so you can see end-to-end wiring without external accounts.
 
 ## Authentication
+
+> **⚠ DO NOT deploy with default `demo-readonly` / `demo-readwrite` tokens.** They are committed to source for preview/dev parity (CI smoke tests, Claude Desktop demos). Production deployments require OAuth 2.1 + PKCE — see [ROADMAP.md](./ROADMAP.md) Future directions.
 
 `v0.1.0` ships `StaticTokenVerifier` with two demo tokens:
 
@@ -107,7 +124,20 @@ uv run pytest -q
 
 See [ROADMAP.md](ROADMAP.md) for v0.2 → v0.5 trajectory.
 
-Current: `v0.1.0` production-survival foundation. Next: `v0.2.0` OAuth 2.1 (target end May 2026).
+**v1.0.0** is the stable reference release. See [ROADMAP.md](./ROADMAP.md) for community-driven future directions.
+
+## Versioning policy
+
+This release is `v1.0.0` — a **stable reference for the current MCP spec (2025-11-25) and FastMCP 3.2.x line**. It is frozen-by-design: maintenance is community-driven from this point forward (see [ROADMAP.md](./ROADMAP.md)).
+
+**What "frozen-by-design" means here**:
+- The five production-survival pillars and the demo PantryAPI integration are validated end-to-end against pinned versions (Python 3.11+ / `mcp` 1.27.0 / `fastmcp` 3.2.4 / Jaeger 1.62.0).
+- A future `v1.1.x` line is contemplated **only if** the MCP specification evolves with breaking changes or FastMCP ships a 4.x line with non-trivial migration. See [ROADMAP.md](./ROADMAP.md) for the conditions.
+- Bug fixes and security patches against `v1.0.x` will be accepted as community PRs and shipped as `v1.0.1`, `v1.0.2`, etc., on a best-effort basis.
+
+**What this is NOT**:
+- A commitment to track every FastMCP release indefinitely.
+- A claim that this template is the right starting point for multi-tenant gateway deployments — see the "Out of scope by design" section of [ROADMAP.md](./ROADMAP.md) for honest scope limits.
 
 ## License
 

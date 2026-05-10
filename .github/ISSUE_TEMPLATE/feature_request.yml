@@ -1,0 +1,47 @@
+name: Feature Request
+description: Suggest a feature or roadmap addition
+title: "[feature] "
+labels: ["roadmap", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Real production deployment feedback weighs more than speculative features.
+        See ROADMAP.md for the planned v0.2 → v0.5 trajectory before opening.
+
+  - type: textarea
+    id: usecase
+    attributes:
+      label: Production use case
+      description: What real-world deployment scenario does this unblock?
+      placeholder: |
+        We are deploying this template behind WorkOS for OAuth, but JWKS rotation is not documented...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Concrete proposal, even if rough
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches were ruled out, and why?
+
+  - type: dropdown
+    id: target_version
+    attributes:
+      label: Target version (best guess)
+      options:
+        - v0.2.0 (auth maturation)
+        - v0.3.0 (audit-ready and async maturity)
+        - v0.4.0 (horizontal scale)
+        - v0.5.0 (multi-agent ready)
+        - Unsure / not in current roadmap
+    validations:
+      required: true
