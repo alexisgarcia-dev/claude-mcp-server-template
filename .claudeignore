@@ -1,0 +1,62 @@
+# .claudeignore - genere J14 PM late 08/05/2026 - reduction conso tokens Claude Code
+
+# === Build artifacts ===
+node_modules/
+dist/
+build/
+target/
+.next/
+.nuxt/
+.vite/
+coverage/
+out/
+
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+*.egg-info/
+
+# === Lock files (committed but Claude waste tokens reading) ===
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+poetry.lock
+uv.lock
+Cargo.lock
+
+# === Logs ===
+*.log
+logs/
+
+# === IDE ===
+.idea/
+.vscode/
+.windsurf/
+.cursor/
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Claude/MCP runtime artifacts ===
+.claude/sessions/
+.claude/cache/
+.claude/file-history/
+.claude/shell-snapshots/
+.claude/projects/
+.claude/local/
+.claude-mem/
+
+# === Backups (Alex pattern multiple .bak files) ===
+*.bak
+*.bak.*
+*.bak-*
+*.bak-J*
