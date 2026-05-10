@@ -1,0 +1,71 @@
+# v0.1.0 demo stack: pantry-mock + mcp-server + jaeger
+# Run: docker compose up
+# Reach MCP server: http://localhost:8000/mcp/ (Bearer demo-readwrite for full access)
+# Jaeger UI: http://localhost:16686
+
+services:
+  pantry-mock:
+    build:
+      context: .
+      dockerfile: Dockerfile.pantry-mock
+    container_name: pantry-mock
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import httpx, sys; sys.exit(0 if httpx.get('http://localhost:8001/', timeout=3.0).is_success else 1)"
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pantry-mcp-server
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    depends_on:
+      pantry-mock:
+        condition: service_healthy
+      jaeger:
+        condition: service_started
+    environment:
+      MCP_TRANSPORT: streamable-http
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8000"
+      PANTRY_API__BASE_URL: "http://pantry-mock:8001"
+      PANTRY_API__API_KEY: ""
+      PANTRY_DEV_MODE: "true"
+      PANTRY_TELEMETRY__ENABLED: "true"
+      PANTRY_TELEMETRY__OTLP_ENDPOINT: "http://jaeger:4318/v1/traces"
+      PANTRY_TELEMETRY__SAMPLING_RATIO: "1.0"
+      HEALTHCHECK_TOKEN: "demo-readonly"
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "/app/healthcheck.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+  jaeger:
+    # ADR-005: pin Jaeger 1.62 for OTLP HTTP receiver compat (verified docs/sources.md)
+    image: jaegertracing/all-in-one:1.62.0
+    container_name: pantry-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "4318:4318"    # OTLP HTTP receiver (matches PANTRY_TELEMETRY__OTLP_ENDPOINT)
