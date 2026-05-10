@@ -9,7 +9,7 @@
 [![FastMCP 3.x](https://img.shields.io/badge/FastMCP-3.x-green.svg)](https://gofastmcp.com)
 [![License MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-![Jaeger UI showing MCP tools/list trace from end-to-end validated quickstart](docs/images/jaeger-ui.png)
+![Jaeger UI showing MCP tools/list trace from end-to-end validated quickstart](docs/images/jaeger-ui.jpg)
 
 A Python MCP server template built around the patterns that distinguish 9% healthy from 52% dead MCP servers in production (April 2026 community scan, 2,181 endpoints).
 
