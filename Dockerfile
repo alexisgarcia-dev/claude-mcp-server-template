@@ -4,7 +4,7 @@
 
 # syntax=docker/dockerfile:1.6
 
-FROM python:3.11-slim AS builder
+FROM python:3.14-slim AS builder
 
 # Install uv 0.11.8 pinned (matches pyproject.toml-aligned tooling)
 COPY --from=ghcr.io/astral-sh/uv:0.11.8 /uv /uvx /bin/
@@ -21,7 +21,7 @@ RUN uv sync --locked --no-dev
 # ---------------------------------------------------------------------------
 # Stage 2: runtime
 # ---------------------------------------------------------------------------
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 
