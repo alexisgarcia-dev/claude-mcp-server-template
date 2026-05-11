@@ -1,6 +1,5 @@
 """Unit tests for StaticTokenVerifier auth setup in server.py."""
 
-import pytest
 
 
 def test_static_token_verifier_demo_tokens_present():

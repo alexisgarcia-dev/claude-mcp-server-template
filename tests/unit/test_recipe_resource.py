@@ -1,6 +1,5 @@
 """Unit tests for recipe_resource - MockTransport pattern (ADR-006 Hybrid C)."""
 
-import json
 from unittest.mock import MagicMock
 
 import httpx
