@@ -71,7 +71,11 @@ class TelemetryConfig(BaseModel):
 
 
 class APIConfig(BaseModel):
-    """PantryAPI connection configuration."""
+    """PantryAPI connection configuration.
+
+    Dry-run mode fields (v1.1.0) enable short-circuiting outbound HTTP at the
+    client chokepoint. See docs/dry-run.md for usage.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
@@ -80,6 +84,11 @@ class APIConfig(BaseModel):
     timeout: int = 30
     max_retries: int = 3
     backoff_factor: float = 2.0
+
+    dry_run: bool = False
+    dry_run_preview_bytes: int = 2048
+    dry_run_bypass_paths: str = "^/health|^/ping"
+    dry_run_extra_scrub_headers: str = ""
 
 
 class Settings(BaseSettings):

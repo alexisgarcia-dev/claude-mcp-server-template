@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-05-11
+
+### Added
+
+- Global dry-run mode (`PANTRY_API__DRY_RUN=true`) — short-circuits all outbound HTTP at the client level, returns a generic mock response, and emits the would-be request as an OpenTelemetry event (with stdlib-logging fallback when no tracer is configured).
+- Configurable body preview cap (`PANTRY_API__DRY_RUN_PREVIEW_BYTES`, default 2048 bytes).
+- Path-exclusion regex (`PANTRY_API__DRY_RUN_BYPASS_PATHS`, default `^/health|^/ping`) for monitoring endpoints.
+- Non-disablable scrubbing of sensitive headers (`Authorization`, `Cookie`, `Set-Cookie`, `X-Api-Key`, `X-Auth-Token`, `Proxy-Authorization`) with extension via `PANTRY_API__DRY_RUN_EXTRA_SCRUB_HEADERS`.
+
+### Changed
+
+- None. Zero breaking change to Tool / Resource / Prompt signatures.
+
+### Documentation
+
+- New `docs/dry-run.md` with vertical use cases (POD, RAG, scrapers), configuration table, telemetry contract, and security model.
+- New "Dry-run troubleshooting" entry in `docs/runbook.md`.
+- README section linking to the dedicated doc.
+
 ## [1.0.0] — 2026-05-10
 
 **Stable reference release. Frozen-by-design.** Maintenance community-driven from this point forward — see [ROADMAP.md](./ROADMAP.md) Future directions.
