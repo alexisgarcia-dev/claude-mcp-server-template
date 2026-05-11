@@ -101,6 +101,19 @@ Replace `PantryAPI` with your own:
 
 The retry logic (`tenacity AsyncRetrying`), secret masking (`SecretStr`), and OTel masking hooks are configured once in `src/pantry_client.py` and reused.
 
+## Dry-run mode (v1.1.0)
+
+Demo the server end-to-end against any MCP client (Claude Desktop, Cursor, Windsurf) **without** standing up the real backend. When `PANTRY_API__DRY_RUN=true`, every outbound HTTP request is short-circuited at the `PantryClient` chokepoint, returns a generic mock dict, and emits the would-be request as an OpenTelemetry event — sensitive headers (`Authorization`, `Cookie`, `X-Api-Key`, ...) are redacted by default. GDPR-safe, OTel-native, opt-in.
+
+```bash
+export PANTRY_API__DRY_RUN=true
+uv run server
+# Then trigger any Tool from your MCP client and inspect the captured
+# payload in Jaeger (http://localhost:16686) under the "pantry.dry_run" span.
+```
+
+See [docs/dry-run.md](docs/dry-run.md) for the full reference (vertical use cases for POD / RAG / scrapers, configuration table, telemetry contract, security model).
+
 ## Stack
 
 - Python 3.14

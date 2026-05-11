@@ -172,6 +172,36 @@ healthcheck:
 **Action**: Verify Python 3.11+ active. uv venv with explicit `--python 3.14`.
 **See**: design §7 pre-flight
 
+## Dry-run troubleshooting
+
+### Symptom: Dry-run is on but I see no spans in Jaeger
+**Cause**: Tracer provider not configured (telemetry disabled or no OTLP endpoint reachable)
+**Fix**:
+1. Verify `PANTRY_TELEMETRY__ENABLED=true` and OTLP endpoint set (default `http://localhost:4318/v1/traces`)
+2. If telemetry is intentionally off, rely on the stdlib-`logging` INFO fallback on the `src.pantry_client` logger (set `LOG_LEVEL=INFO`)
+**See**: docs/dry-run.md "Telemetry contract" + ADR-D3
+
+### Symptom: /health endpoint returns the generic mock dict
+**Cause**: `dry_run_bypass_paths` regex does not match your monitoring path
+**Fix**: Default is `"^/health|^/ping"` (re.search-style). Override to match your monitoring routes:
+```bash
+PANTRY_API__DRY_RUN_BYPASS_PATHS="^/health|^/ping|^/readyz|^/livez"
+```
+**See**: docs/dry-run.md "Configuration reference"
+
+### Symptom: My secret appears in Jaeger event attributes
+**Cause**: Header name not in the hardcoded scrub list (only `Authorization`, `Cookie`, `Set-Cookie`, `X-Api-Key`, `X-Auth-Token`, `Proxy-Authorization` are redacted by default)
+**Fix**: Extend the scrub set via env var (comma-separated, case-insensitive):
+```bash
+PANTRY_API__DRY_RUN_EXTRA_SCRUB_HEADERS="X-Tenant-Token,X-Signature,X-Printify-Hmac"
+```
+**See**: docs/dry-run.md "Security model"
+
+### Symptom: Existing tests fail after enabling dry-run
+**Cause**: Test process sets `PANTRY_API__DRY_RUN=true` at module / shell scope, leaking into tests that expect real-backend behavior
+**Fix**: Isolate dry-run per-test via `monkeypatch.setenv("PANTRY_API__DRY_RUN", "true")` inside the test function, never at module scope. Rebuild `Settings()` and `PantryClient` inside the test after setting the env var.
+**See**: tests/unit/test_dry_run.py T1-T4 examples
+
 ## Quick reference paths
 
 - **Architecture**: design-v0.1.0.md §1
