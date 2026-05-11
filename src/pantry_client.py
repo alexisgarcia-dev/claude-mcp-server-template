@@ -5,12 +5,19 @@ repeating auth/retry logic. Lifecycle managed by server.py lifespan.
 
 Retry strategy: tenacity AsyncRetrying (not httpx native, which only retries ConnectError).
 
+Dry-run mode (v1.1.0): short-circuits outbound HTTP at this single chokepoint when
+Settings.api.dry_run=True. See docs/dry-run.md.
+
 See: docs/design-v0.1.0.md §3
 """
 
+import json
+import logging
+import re
 from typing import Any
 
 import httpx
+from opentelemetry import trace
 from tenacity import (
     AsyncRetrying,
     retry_if_exception,
@@ -21,6 +28,11 @@ from tenacity import (
 from src.config import Settings
 from src.error_messages import ErrorMessages
 
+_HARDCODED_SCRUB_HEADERS = frozenset({
+    "authorization", "cookie", "set-cookie",
+    "x-api-key", "x-auth-token", "proxy-authorization",
+})
+
 
 def _is_retryable(e: BaseException) -> bool:
     """Retry on connection errors, timeouts, 429, and 5xx."""
@@ -29,6 +41,13 @@ def _is_retryable(e: BaseException) -> bool:
     if isinstance(e, httpx.HTTPStatusError):
         return e.response.status_code == 429 or e.response.status_code >= 500
     return False
+
+
+def _serialize_json(obj: Any) -> bytes:
+    """Serialize a JSON-able object to UTF-8 bytes. Returns b'' for None."""
+    if obj is None:
+        return b""
+    return json.dumps(obj).encode("utf-8")
 
 
 class PantryClient:
@@ -60,8 +79,75 @@ class PantryClient:
 
         return headers
 
+    def _should_bypass(self, path: str) -> bool:
+        """Return True if `path` matches the configured bypass regex (memoized)."""
+        bypass_re: re.Pattern[str] | None = getattr(self, "_bypass_re", None)
+        if bypass_re is None:
+            pattern = self.config.api.dry_run_bypass_paths or ""
+            bypass_re = re.compile(pattern) if pattern else None
+            self._bypass_re = bypass_re
+        if bypass_re is None:
+            return False
+        return bool(bypass_re.search(path))
+
+    def _scrub_headers(self, headers: dict[str, str]) -> dict[str, str]:
+        """Redact values of sensitive headers (hardcoded + extension), case-insensitive."""
+        extension = {
+            name.strip().lower()
+            for name in self.config.api.dry_run_extra_scrub_headers.split(",")
+            if name.strip()
+        }
+        scrub_set = _HARDCODED_SCRUB_HEADERS | extension
+        return {
+            key: ("<redacted>" if key.lower() in scrub_set else value)
+            for key, value in headers.items()
+        }
+
+    def _emit_dry_run_telemetry(
+        self,
+        method: str,
+        path: str,
+        headers: dict[str, str],
+        body_bytes: bytes,
+    ) -> None:
+        """Emit dry-run telemetry as OTel event with stdlib-logging fallback. Non-fatal."""
+        preview = body_bytes[: self.config.api.dry_run_preview_bytes].decode(
+            "utf-8", errors="replace"
+        )
+        attrs: dict[str, str | int] = {
+            "http.method": method,
+            "http.url.path": path,
+            "http.request.body.size": len(body_bytes),
+            "http.request.body.preview": preview,
+            "http.request.headers.scrubbed": json.dumps(headers),
+        }
+        log = logging.getLogger("src.pantry_client")
+        try:
+            tracer = trace.get_tracer(__name__)
+            with tracer.start_as_current_span("pantry.dry_run") as span:
+                span.set_attribute("mcp.dry_run", True)
+                if span.is_recording():
+                    span.add_event("dry_run.request", attributes=attrs)
+                else:
+                    log.info("dry_run", extra=attrs)
+        except Exception as e:
+            log.warning("dry_run telemetry emission failed: %s", e)
+
     async def _request_with_retry(self, method: str, path: str, **kwargs: Any) -> Any:
         """Execute HTTP request with retry on transient failures."""
+        if self.config.api.dry_run and not self._should_bypass(path):
+            headers = self._scrub_headers(
+                dict(self.client.headers) | dict(kwargs.get("headers", {}))
+            )
+            body = kwargs.get("content") or _serialize_json(kwargs.get("json"))
+            self._emit_dry_run_telemetry(method, path, headers, body)
+            return {
+                "_dry_run": True,
+                "_method": method,
+                "_path": path,
+                "_payload_size": len(body) if body else 0,
+            }
+
         async for attempt in AsyncRetrying(
             retry=retry_if_exception(_is_retryable),
             stop=stop_after_attempt(self.config.api.max_retries + 1),
