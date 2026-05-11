@@ -1,6 +1,6 @@
 [project]
 name = "claude-mcp-server-template"
-version = "1.0.0"
+version = "1.1.0"
 description = "Production-survival Python MCP server template — Tools, Resources, Prompts; Streamable HTTP transport; OpenTelemetry + Jaeger observability; JSON-RPC healthcheck; Docker compose stack; ADR-light decisions documented."
 readme = "README.md"
 requires-python = ">=3.11"
