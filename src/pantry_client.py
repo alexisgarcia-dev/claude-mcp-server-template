@@ -191,16 +191,12 @@ class PantryClient:
         if status == 404:
             resource_type = path.split("/")[1] if "/" in path else "resource"
             return FileNotFoundError(
-                ErrorMessages.RESOURCE_NOT_FOUND.format(
-                    resource_type=resource_type, path=path
-                )
+                ErrorMessages.RESOURCE_NOT_FOUND.format(resource_type=resource_type, path=path)
             )
 
         if status in (401, 403):
             return PermissionError(
-                ErrorMessages.AUTH_EXPIRED
-                if status == 401
-                else ErrorMessages.FORBIDDEN
+                ErrorMessages.AUTH_EXPIRED if status == 401 else ErrorMessages.FORBIDDEN
             )
 
         if status == 422:
@@ -212,9 +208,7 @@ class PantryClient:
 
         # 429, 5xx, and any other errors map to RuntimeError
         return RuntimeError(
-            ErrorMessages.API_ERROR.format(
-                status=status, message=error.response.text[:200]
-            )
+            ErrorMessages.API_ERROR.format(status=status, message=error.response.text[:200])
         )
 
     async def aclose(self) -> None:

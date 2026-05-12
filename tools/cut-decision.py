@@ -19,6 +19,7 @@ Tools count = nombre de modules avec `def register(` dans src/tools/
 Resources count = idem dans src/resources/
 Prompts count = idem dans src/prompts/
 """
+
 from __future__ import annotations
 
 import json
@@ -61,9 +62,7 @@ def run_pytest_quick() -> tuple[int, int]:
     return passed, failed
 
 
-def decide(
-    tools: int, resources: int, prompts: int, passed: int, failed: int
-) -> dict:
+def decide(tools: int, resources: int, prompts: int, passed: int, failed: int) -> dict:
     """Decision rule formalisée -- single source of truth, ZERO ambiguïté."""
     if passed < 0:
         return {
@@ -89,8 +88,7 @@ def decide(
     elif tools <= 2:
         verdict = "CUT_PROMPT_AND_RESOURCE"
         rationale = (
-            "Retard sévère. Ship 4 Tools + Tasks only. Logger ADR-011. "
-            "Repositioning v3 dégradé."
+            "Retard sévère. Ship 4 Tools + Tasks only. Logger ADR-011. Repositioning v3 dégradé."
         )
     else:
         verdict = "WARN_AMBIGUOUS"

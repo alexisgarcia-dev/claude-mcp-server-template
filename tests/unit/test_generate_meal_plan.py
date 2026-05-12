@@ -155,9 +155,7 @@ async def test_generate_meal_plan_no_recipes_found(mock_pantry_client, monkeypat
     """generate_meal_plan uses fallback name when API returns no recipes."""
 
     def mock_handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(
-            200, json={"recipes": [], "total": 0, "next_cursor": None}
-        )
+        return httpx.Response(200, json={"recipes": [], "total": 0, "next_cursor": None})
 
     client = mock_pantry_client(mock_handler)
     monkeypatch.setattr("src.server.get_pantry_client", lambda: client)

@@ -64,9 +64,7 @@ async def test_get_recipe_success(mock_pantry_client, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_get_recipe_not_found_raises_filenotfounderror(
-    mock_pantry_client, monkeypatch
-):
+async def test_get_recipe_not_found_raises_filenotfounderror(mock_pantry_client, monkeypatch):
     """get_recipe raises FileNotFoundError when recipe doesn't exist (404)."""
 
     def mock_handler(request: httpx.Request) -> httpx.Response:
@@ -75,18 +73,14 @@ async def test_get_recipe_not_found_raises_filenotfounderror(
     client = mock_pantry_client(mock_handler)
     monkeypatch.setattr("src.server.get_pantry_client", lambda: client)
 
-    with pytest.raises(
-        FileNotFoundError, match="Resource recipes not found at /recipes/999"
-    ):
+    with pytest.raises(FileNotFoundError, match="Resource recipes not found at /recipes/999"):
         await get_recipe_impl("999")
 
     await client.aclose()
 
 
 @pytest.mark.asyncio
-async def test_get_recipe_auth_error_raises_permissionerror(
-    mock_pantry_client, monkeypatch
-):
+async def test_get_recipe_auth_error_raises_permissionerror(mock_pantry_client, monkeypatch):
     """get_recipe raises PermissionError when auth fails (401)."""
 
     def mock_handler(request: httpx.Request) -> httpx.Response:

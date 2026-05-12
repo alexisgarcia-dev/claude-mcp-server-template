@@ -36,9 +36,7 @@ def test_all_constants_exist_and_are_strings() -> None:
 
 
 def test_resource_not_found_format() -> None:
-    msg = ErrorMessages.RESOURCE_NOT_FOUND.format(
-        resource_type="recipe", path="/recipes/42"
-    )
+    msg = ErrorMessages.RESOURCE_NOT_FOUND.format(resource_type="recipe", path="/recipes/42")
     assert "recipe" in msg
     assert "/recipes/42" in msg
     assert "search_recipes" in msg

@@ -33,9 +33,7 @@ async def test_otel_masking_hook_masks_authorization():
 
     await _mask_auth_header(span, request_info)
 
-    span.set_attribute.assert_called_once_with(
-        "http.request.header.authorization", "***MASKED***"
-    )
+    span.set_attribute.assert_called_once_with("http.request.header.authorization", "***MASKED***")
     for call in span.set_attribute.call_args_list:
         assert "actual-api-key-secret" not in str(call.args)
 

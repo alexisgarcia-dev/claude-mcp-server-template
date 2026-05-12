@@ -220,6 +220,9 @@ __marimo__/
 # Brainstorm artifacts (Superpowers skill local-only outputs)
 .superpowers/
 
+# Archived handoff/state files (preserved locally, excluded from repo)
+.archive/
+
 # Security — defensive entries (no real secret has ever been committed,
 # but blocking common credential filename patterns prevents future accidents)
 *.pem

@@ -99,7 +99,7 @@
 
 ### Symptom: Suspicious request from unknown origin to MCP server
 **Cause**: Possible DNS rebinding attempt OR misconfigured client
-**Action**: 
+**Action**:
 1. Verify FastMCP host="127.0.0.1" (default since CVE-2025-66416 fix)
 2. If 0.0.0.0 binding: configure TransportSecuritySettings allowed_hosts
 3. Review server logs for Origin header anomalies
@@ -107,7 +107,7 @@
 
 ### Symptom: Secret leaked in logs/traces
 **Cause**: SecretStr field used as plain str OR get_secret_value() called and logged
-**Fix**: 
+**Fix**:
 1. Audit code for `.get_secret_value()` usage in logged contexts
 2. Verify SecretStr fields on api_key, client_secret in config.py
 3. Verify OTel httpx masking hooks active
@@ -139,7 +139,7 @@ healthcheck:
 
 ### Symptom: Jaeger UI not accessible at http://localhost:16686
 **Cause**: Port mapping or service not started
-**Fix**: 
+**Fix**:
 1. `docker-compose ps` verify jaeger service up
 2. Check port mapping: `127.0.0.1:16686:16686`
 3. Verify `COLLECTOR_OTLP_ENABLED=true` env var set

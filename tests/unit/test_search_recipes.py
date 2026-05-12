@@ -207,9 +207,7 @@ async def test_search_recipes_limit_validation_too_high(mock_pantry_client, monk
 
 
 @pytest.mark.asyncio
-async def test_search_recipes_auth_error_raises_permissionerror(
-    mock_pantry_client, monkeypatch
-):
+async def test_search_recipes_auth_error_raises_permissionerror(mock_pantry_client, monkeypatch):
     """search_recipes raises PermissionError when auth fails (401)."""
 
     def mock_handler(request: httpx.Request) -> httpx.Response:

@@ -148,7 +148,8 @@ class Settings(BaseSettings):
                 "    API key validation is DISABLED.\n"
                 "    This setting is for LOCAL DEVELOPMENT ONLY.\n"
                 "    Set dev_mode=false in config.toml before production deployment.\n"
-                + "=" * 70 + "\n"
+                + "=" * 70
+                + "\n"
             )
             logger.warning(warning_message)
             print(warning_message, file=sys.stderr)
